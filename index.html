@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rutina Casa</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: #0a0a0a;
+      color: #fff;
+      font-family: 'DM Mono', monospace;
+    }
+    .bebas { font-family: 'Bebas Neue', cursive; }
+
+    /* Header */
+    #header {
+      padding: 32px 20px 0;
+      text-align: center;
+    }
+    #header h1 {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 48px;
+      letter-spacing: 6px;
+      color: #fff;
+    }
+    #header h1 span { color: #00ff87; }
+    #header p {
+      color: #444;
+      font-size: 11px;
+      letter-spacing: 3px;
+      margin-top: 4px;
+    }
+
+    /* Tabs */
+    #tabs {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      padding: 24px 20px 0;
+    }
+    .tab-btn {
+      background: transparent;
+      color: #555;
+      border: 1px solid #222;
+      padding: 8px 28px;
+      font-family: 'Bebas Neue', cursive;
+      font-size: 16px;
+      letter-spacing: 3px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: #00ff87;
+      color: #000;
+      border-color: #00ff87;
+    }
+
+    /* Day selector */
+    #day-selector {
+      display: flex;
+      gap: 6px;
+      padding: 20px 16px 0;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    #day-selector::-webkit-scrollbar { display: none; }
+    .day-btn {
+      padding: 10px 14px;
+      font-family: 'Bebas Neue', cursive;
+      font-size: 13px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      border-radius: 2px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.2s;
+      border: 1px solid #222;
+      background: #111;
+      color: #444;
+    }
+
+    /* Day header */
+    #day-header {
+      padding: 20px 16px 0;
+    }
+    #day-header-inner {
+      border-left: 3px solid;
+      padding-left: 16px;
+    }
+    #day-header-inner .label {
+      font-size: 11px;
+      color: #444;
+      letter-spacing: 3px;
+    }
+    #day-header-inner h2 {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 32px;
+      letter-spacing: 3px;
+      margin-top: 4px;
+    }
+
+    /* Exercises */
+    #exercises {
+      padding: 16px 16px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .exercise-card {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .exercise-info {
+      padding: 14px 16px 10px;
+    }
+    .exercise-info .ex-name {
+      font-size: 13px;
+      color: #fff;
+      font-weight: 500;
+      line-height: 1.3;
+    }
+    .exercise-info .ex-meta {
+      font-size: 10px;
+      color: #555;
+      letter-spacing: 1px;
+      margin-top: 6px;
+    }
+    .exercise-info .ex-tip {
+      font-size: 10px;
+      color: #444;
+      font-style: italic;
+      margin-top: 6px;
+    }
+    .sets-row {
+      display: flex;
+      gap: 6px;
+      padding: 0 16px 12px;
+      flex-wrap: wrap;
+    }
+    .set-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 4px;
+      font-family: 'Bebas Neue', cursive;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: 1px solid #2a2a2a;
+      background: #1a1a1a;
+      color: #555;
+    }
+    .set-btn.done {
+      color: #000;
+    }
+    .timer-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      border: 1px dashed #222;
+      background: transparent;
+      color: #333;
+    }
+    .progress-note {
+      background: #0d1a12;
+      border: 1px solid #1a3a24;
+      border-radius: 6px;
+      padding: 16px;
+      margin-top: 4px;
+    }
+    .progress-note .pn-label {
+      font-size: 10px;
+      color: #00ff87;
+      letter-spacing: 2px;
+    }
+    .progress-note p {
+      font-size: 11px;
+      color: #555;
+      margin-top: 6px;
+    }
+
+    /* Playlist */
+    #playlist-container {
+      padding: 20px 16px 80px;
+    }
+    #playlist-container .pl-header {
+      margin-bottom: 20px;
+    }
+    #playlist-container .pl-header .label {
+      font-size: 10px;
+      color: #444;
+      letter-spacing: 3px;
+    }
+    #playlist-container .pl-header h2 {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 32px;
+      letter-spacing: 3px;
+      margin-top: 4px;
+    }
+    #playlist-container .pl-header h2 span { color: #ff6b6b; }
+    #playlist-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .song-card {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 6px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .song-num {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 22px;
+      color: #222;
+      min-width: 28px;
+    }
+    .song-info { flex: 1; }
+    .song-title { font-size: 13px; color: #fff; font-weight: 500; }
+    .song-artist { font-size: 10px; color: #555; margin-top: 3px; }
+    .song-vibe { font-size: 11px; color: #444; }
+    .pl-tip {
+      margin-top: 20px;
+      background: #1a1000;
+      border: 1px solid #3a2a00;
+      border-radius: 6px;
+      padding: 16px;
+    }
+    .pl-tip .tip-label { font-size: 10px; color: #ffd93d; letter-spacing: 2px; }
+    .pl-tip p { font-size: 11px; color: #666; margin-top: 6px; }
+
+    /* Rest Timer Overlay */
+    #timer-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+    }
+    #timer-overlay.show { display: flex; }
+    #timer-label {
+      color: #888;
+      font-family: 'Bebas Neue', cursive;
+      font-size: 18px;
+      letter-spacing: 4px;
+    }
+    #timer-ring-wrap {
+      position: relative;
+      width: 160px;
+      height: 160px;
+    }
+    #timer-svg {
+      position: absolute;
+      top: 0; left: 0;
+      transform: rotate(-90deg);
+    }
+    #timer-track { fill: none; stroke: #222; stroke-width: 8; }
+    #timer-progress {
+      fill: none;
+      stroke: #ff6b6b;
+      stroke-width: 8;
+      stroke-dasharray: 439.82;
+      stroke-dashoffset: 439.82;
+      transition: stroke-dashoffset 0.9s linear, stroke 0.3s;
+    }
+    #timer-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #timer-count {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 52px;
+      color: #fff;
+      line-height: 1;
+    }
+    #timer-sec-label { color: #555; font-size: 12px; letter-spacing: 2px; }
+    #timer-close-btn {
+      border: none;
+      padding: 12px 36px;
+      font-family: 'Bebas Neue', cursive;
+      font-size: 20px;
+      letter-spacing: 3px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    /* Hidden */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- Rest Timer Overlay -->
+<div id="timer-overlay">
+  <p id="timer-label">DESCANSANDO</p>
+  <div id="timer-ring-wrap">
+    <svg id="timer-svg" width="160" height="160">
+      <circle id="timer-track" cx="80" cy="80" r="70" />
+      <circle id="timer-progress" cx="80" cy="80" r="70" />
+    </svg>
+    <div id="timer-center">
+      <span id="timer-count">0</span>
+      <span id="timer-sec-label">SEG</span>
+    </div>
+  </div>
+  <button id="timer-close-btn">SALTAR</button>
+</div>
+
+<!-- App -->
+<div id="app">
+
+  <!-- Header -->
+  <div id="header">
+    <h1>RUTINA <span>CASA</span></h1>
+    <p>5 DÍAS · CARGA PROGRESIVA · SIN EXCUSAS</p>
+  </div>
+
+  <!-- Tabs -->
+  <div id="tabs">
+    <button class="tab-btn active" data-tab="rutina">💪 RUTINA</button>
+    <button class="tab-btn" data-tab="playlist">🎵 PLAYLIST</button>
+  </div>
+
+  <!-- RUTINA VIEW -->
+  <div id="view-rutina">
+    <div id="day-selector"></div>
+    <div id="day-header">
+      <div id="day-header-inner">
+        <p class="label" id="day-label"></p>
+        <h2 id="day-focus"></h2>
+      </div>
+    </div>
+    <div id="exercises"></div>
+  </div>
+
+  <!-- PLAYLIST VIEW -->
+  <div id="view-playlist" class="hidden">
+    <div id="playlist-container">
+      <div class="pl-header">
+        <p class="label">🎵 PARA ENTRENAR</p>
+        <h2>PLAYLIST <span>BEAST</span></h2>
+      </div>
+      <div id="playlist-list"></div>
+      <div class="pl-tip">
+        <p class="tip-label">🔊 TIP</p>
+        <p>Buscalas en Spotify o YouTube. En orden están pensadas para arrancar fuerte y cerrar con todo.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const DAYS = [
+  {
+    day: "LUNES", focus: "Espalda + Bíceps", emoji: "🏋️", color: "#00ff87",
+    exercises: [
+      { name: "Dominadas con mochila (8-10kg)", sets: 4, reps: "6", rest: 120, tip: "Escápulas abajo antes de tirar. Bajada 3 seg." },
+      { name: "Remo con mancuerna", sets: 4, reps: "10 c/brazo", rest: 90, tip: "Espalda paralela al suelo. Codo pegado al cuerpo." },
+      { name: "Curl martillo mancuerna", sets: 3, reps: "12", rest: 60, tip: "Sin balanceo. Movimiento estricto." },
+      { name: "Dominadas supinas (sin carga, bajada 4 seg)", sets: 3, reps: "MAX", rest: 90, tip: "Bajada ultra lenta. Agarre supino activa más bíceps." },
+    ],
+  },
+  {
+    day: "MARTES", focus: "Pecho + Tríceps", emoji: "💪", color: "#ff6b6b",
+    exercises: [
+      { name: "Fondos entre sillas con mochila (8-10kg)", sets: 4, reps: "8", rest: 120, tip: "Ligera inclinación hacia adelante activa más pecho." },
+      { name: "Flexiones diamante con mochila (5-6kg)", sets: 3, reps: "10", rest: 90, tip: "Manos juntas bajo el pecho. Codos pegados." },
+      { name: "Flexiones declinadas (pies en silla)", sets: 3, reps: "12", rest: 90, tip: "Zona alta del pecho. Bajada controlada 2 seg." },
+      { name: "Press mancuernas acostado", sets: 3, reps: "15", rest: 60, tip: "Empujar y apretar pecho arriba. Rango completo." },
+    ],
+  },
+  {
+    day: "MIÉRCOLES", focus: "Piernas", emoji: "🦵", color: "#ffd93d",
+    exercises: [
+      { name: "Sentadilla búlgara con mochila (12-15kg)", sets: 4, reps: "10 c/pierna", rest: 120, tip: "Rodilla trasera casi toca el suelo. Torso erguido." },
+      { name: "Peso muerto rumano mochila + mancuernas", sets: 4, reps: "12", rest: 120, tip: "Cadera hacia atrás, no doblar rodillas en exceso." },
+      { name: "Zancadas caminando con mancuernas", sets: 3, reps: "12 c/pierna", rest: 90, tip: "Paso largo. Rodilla delantera no pasa la punta del pie." },
+      { name: "Sentadilla con salto (sin carga, explosivo)", sets: 3, reps: "15", rest: 60, tip: "Bajada lenta, subida explosiva al máximo." },
+    ],
+  },
+  {
+    day: "JUEVES", focus: "Hombros + Core", emoji: "🎯", color: "#c77dff",
+    exercises: [
+      { name: "Press militar mancuernas", sets: 4, reps: "12", rest: 90, tip: "No arquear la espalda. Core apretado todo el tiempo." },
+      { name: "Elevaciones laterales", sets: 3, reps: "15", rest: 60, tip: "Codos ligeramente doblados. Subir hasta altura de hombros." },
+      { name: "Remo al mentón mancuernas", sets: 3, reps: "12", rest: 60, tip: "Codos por encima de las manos en la subida." },
+      { name: "Plancha con mochila (10kg) en espalda", sets: 3, reps: "45 seg", rest: 60, tip: "Cuerpo recto como tabla. No dejar caer cadera." },
+      { name: "Abdominales colgado en barra", sets: 3, reps: "15", rest: 60, tip: "Rodillas al pecho o piernas rectas. Sin balanceo." },
+    ],
+  },
+  {
+    day: "VIERNES", focus: "Full Body Pesado", emoji: "🔥", color: "#ff9a3c",
+    exercises: [
+      { name: "Dominadas con mochila (máximo peso)", sets: 5, reps: "5", rest: 150, tip: "Día de fuerza pura. Técnica perfecta sobre todo." },
+      { name: "Fondos con mochila (máximo peso)", sets: 4, reps: "8", rest: 120, tip: "El peso más alto que puedas controlar." },
+      { name: "Sentadilla búlgara pesada", sets: 3, reps: "8 c/pierna", rest: 120, tip: "Más peso que el miércoles si pudiste." },
+      { name: "Remo mancuerna pesado", sets: 4, reps: "8 c/brazo", rest: 90, tip: "Día de tirar fuerte. Controlá siempre la bajada." },
+    ],
+  },
+];
+
+const PLAYLIST = [
+  { title: "POWER", artist: "Kanye West", vibe: "🔱 Arranque épico" },
+  { title: "Lose Yourself", artist: "Eminem", vibe: "🎤 Foco total" },
+  { title: "Till I Collapse", artist: "Eminem", vibe: "💀 Series pesadas" },
+  { title: "Eye of the Tiger", artist: "Survivor", vibe: "👁️ Clásico eterno" },
+  { title: "Stronger", artist: "Kanye West", vibe: "⚡ Mid-workout" },
+  { title: "Can't Hold Us", artist: "Macklemore", vibe: "🚀 Explosivo" },
+  { title: "Sicko Mode", artist: "Travis Scott", vibe: "🌀 Ritmo salvaje" },
+  { title: "Jump", artist: "Tinie Tempah", vibe: "🦘 Piernas día" },
+  { title: "Welcome to the Jungle", artist: "Guns N' Roses", vibe: "🐆 Full body" },
+  { title: "Thunderstruck", artist: "AC/DC", vibe: "⚡ Cierre brutal" },
+];
+
+// ─── State ───────────────────────────────────────────────
+let activeDay = 0;
+let activeTab = "rutina";
+let completedSets = {}; // key: "day-exIdx-setIdx"
+let timerInterval = null;
+let timerTotal = 0;
+let timerLeft = 0;
+
+// ─── Timer ───────────────────────────────────────────────
+const overlay   = document.getElementById("timer-overlay");
+const timerCount = document.getElementById("timer-count");
+const timerProgress = document.getElementById("timer-progress");
+const timerCloseBtn = document.getElementById("timer-close-btn");
+const CIRC = 2 * Math.PI * 70; // 439.82
+
+function startTimer(seconds) {
+  clearInterval(timerInterval);
+  timerTotal = seconds;
+  timerLeft  = seconds;
+  renderTimer();
+  overlay.classList.add("show");
+
+  timerInterval = setInterval(() => {
+    timerLeft--;
+    renderTimer();
+    if (timerLeft <= 0) {
+      clearInterval(timerInterval);
+    }
+  }, 1000);
+}
+
+function renderTimer() {
+  timerCount.textContent = timerLeft;
+  const pct = (timerTotal - timerLeft) / timerTotal;
+  timerProgress.style.strokeDashoffset = CIRC * (1 - pct);
+  if (timerLeft <= 0) {
+    timerProgress.style.stroke = "#00ff87";
+    timerCount.style.color = "#00ff87";
+    timerCloseBtn.style.background = "#00ff87";
+    timerCloseBtn.style.color = "#000";
+    timerCloseBtn.style.border = "none";
+    timerCloseBtn.textContent = "¡VAMOS!";
+  } else {
+    timerProgress.style.stroke = "#ff6b6b";
+    timerCount.style.color = "#fff";
+    timerCloseBtn.style.background = "transparent";
+    timerCloseBtn.style.color = "#444";
+    timerCloseBtn.style.border = "1px solid #333";
+    timerCloseBtn.textContent = "SALTAR";
+  }
+}
+
+timerCloseBtn.addEventListener("click", () => {
+  clearInterval(timerInterval);
+  overlay.classList.remove("show");
+});
+
+// ─── Render Playlist ─────────────────────────────────────
+function renderPlaylist() {
+  const list = document.getElementById("playlist-list");
+  list.innerHTML = PLAYLIST.map((s, i) => `
+    <div class="song-card">
+      <span class="song-num">${String(i+1).padStart(2,"0")}</span>
+      <div class="song-info">
+        <p class="song-title">${s.title}</p>
+        <p class="song-artist">${s.artist}</p>
+      </div>
+      <span class="song-vibe">${s.vibe}</span>
+    </div>
+  `).join("");
+}
+
+// ─── Render Day ──────────────────────────────────────────
+function renderDay() {
+  const d = DAYS[activeDay];
+
+  // Day buttons
+  const sel = document.getElementById("day-selector");
+  sel.innerHTML = DAYS.map((day, i) => `
+    <button class="day-btn${i === activeDay ? " active" : ""}"
+      style="${i === activeDay
+        ? `background:${day.color};color:#000;border-color:${day.color};`
+        : ""}"
+      data-idx="${i}">${day.day}</button>
+  `).join("");
+  sel.querySelectorAll(".day-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      activeDay = +btn.dataset.idx;
+      renderDay();
+    });
+  });
+
+  // Day header
+  document.getElementById("day-header-inner").style.borderLeftColor = d.color;
+  document.getElementById("day-label").textContent = `${d.emoji} HOY TOCA`;
+  const focusEl = document.getElementById("day-focus");
+  focusEl.textContent = d.focus;
+  focusEl.style.color = d.color;
+
+  // Exercises
+  const container = document.getElementById("exercises");
+  container.innerHTML = d.exercises.map((ex, exIdx) => {
+    const setsHtml = Array.from({length: ex.sets}, (_, sIdx) => {
+      const key = `${activeDay}-${exIdx}-${sIdx}`;
+      const done = !!completedSets[key];
+      return `<button class="set-btn${done ? " done" : ""}"
+        style="${done ? `background:${d.color};border-color:${d.color};` : ""}"
+        data-ex="${exIdx}" data-set="${sIdx}" data-rest="${ex.rest}">
+        ${done ? "✓" : sIdx + 1}
+      </button>`;
+    }).join("");
+
+    return `
+      <div class="exercise-card">
+        <div class="exercise-info">
+          <p class="ex-name">${ex.name}</p>
+          <p class="ex-meta">${ex.sets} SERIES · ${ex.reps} REPS · ${ex.rest}s DESCANSO</p>
+          <p class="ex-tip">💡 ${ex.tip}</p>
+        </div>
+        <div class="sets-row">
+          ${setsHtml}
+          <button class="timer-btn" data-rest="${ex.rest}">⏱</button>
+        </div>
+      </div>
+    `;
+  }).join("") + `
+    <div class="progress-note">
+      <p class="pn-label">📈 PROGRESIÓN SEMANAL</p>
+      <p>Si completás todas las reps con buena forma → sumá 1-2kg a la mochila la próxima semana.</p>
+    </div>
+  `;
+
+  // Set button listeners
+  container.querySelectorAll(".set-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const exIdx = +btn.dataset.ex;
+      const sIdx  = +btn.dataset.set;
+      const rest  = +btn.dataset.rest;
+      const key = `${activeDay}-${exIdx}-${sIdx}`;
+      const wasDone = !!completedSets[key];
+      completedSets[key] = !wasDone;
+      if (!wasDone) startTimer(rest);
+      renderDay();
+    });
+  });
+
+  // Timer-only buttons
+  container.querySelectorAll(".timer-btn").forEach(btn => {
+    btn.addEventListener("click", () => startTimer(+btn.dataset.rest));
+  });
+}
+
+// ─── Tabs ─────────────────────────────────────────────────
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    activeTab = btn.dataset.tab;
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("view-rutina").classList.toggle("hidden", activeTab !== "rutina");
+    document.getElementById("view-playlist").classList.toggle("hidden", activeTab !== "playlist");
+  });
+});
+
+// ─── Init ─────────────────────────────────────────────────
+renderDay();
+renderPlaylist();
+</script>
+</body>
+</html>
